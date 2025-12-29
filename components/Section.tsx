@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Calendar from './Calendar';
 import { ThemeConfig } from '../types';
 import { getThematicWisdom } from '../services/geminiService';
@@ -16,9 +16,16 @@ const Section: React.FC<SectionProps> = ({ theme, index, progress, onEnterRealm 
   const [wisdom, setWisdom] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Define particle counts based on progress
-  const particleCount = Math.floor(progress * 25);
-  const particles = Array.from({ length: particleCount });
+  // Memoize particle stats for consistency
+  const particlesData = useMemo(() => {
+    return Array.from({ length: 40 }).map(() => ({
+      left: `${Math.random() * 120 - 10}%`,
+      top: `${Math.random() * 120 - 10}%`,
+      delay: `${Math.random() * 5}s`,
+      duration: `${Math.random() * 3 + 2}s`,
+      size: Math.random() * 1 + 0.5
+    }));
+  }, []);
 
   const fetchWisdom = async () => {
     setLoading(true);
@@ -34,35 +41,36 @@ const Section: React.FC<SectionProps> = ({ theme, index, progress, onEnterRealm 
       {/* Background Overlay */}
       <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
-      {/* Transitional Particle System */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        {particles.map((_, i) => (
+      {/* Transitional Particle System - Becomes visible as section enters */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        {particlesData.map((p, i) => (
           <div
             key={i}
-            className="absolute rounded-full pointer-events-none opacity-0"
+            className="absolute rounded-full pointer-events-none"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              width: theme.particleType === 'bubbles' ? `${Math.random() * 20 + 5}px` : '4px',
-              height: theme.particleType === 'bubbles' ? `${Math.random() * 20 + 5}px` : '4px',
+              left: p.left,
+              top: p.top,
+              width: theme.particleType === 'bubbles' ? `${p.size * 15}px` : `${p.size * 4}px`,
+              height: theme.particleType === 'bubbles' ? `${p.size * 15}px` : `${p.size * 4}px`,
               backgroundColor: theme.particleType === 'rain' ? '#0ff' : 'white',
-              boxShadow: theme.particleType === 'snow' ? '0 0 10px white' : 'none',
-              border: theme.particleType === 'bubbles' ? '1px solid rgba(255,255,255,0.3)' : 'none',
+              boxShadow: theme.particleType === 'snow' || theme.particleType === 'stars' ? '0 0 12px white' : 'none',
+              border: theme.particleType === 'bubbles' ? '1px solid rgba(255,255,255,0.4)' : 'none',
               animation: getAnimation(theme.particleType),
-              animationDuration: `${Math.random() * 3 + 2}s`,
-              animationDelay: `${Math.random() * 2}s`,
-              opacity: progress * 0.6
+              animationDuration: p.duration,
+              animationDelay: p.delay,
+              opacity: progress * 0.7,
+              visibility: progress > 0.05 ? 'visible' : 'hidden'
             }}
           />
         ))}
       </div>
 
-      <div className={`relative z-10 w-full max-w-7xl mx-auto px-8 flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16 transition-all duration-[1s] ease-out ${progress > 0.5 ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-20 scale-95'}`}>
+      <div className={`relative z-10 w-full max-w-7xl mx-auto px-8 flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16 transition-all duration-[1.2s] ease-out ${progress > 0.4 ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-32 scale-90 blur-lg'}`}>
         
         {/* Left Side: Information */}
         <div className="flex-[1.2] text-center md:text-left">
           <div className="flex items-center justify-center md:justify-start gap-4 mb-6">
-            <span className="text-6xl md:text-8xl drop-shadow-2xl">{theme.icon}</span>
+            <span className="text-6xl md:text-8xl drop-shadow-2xl animate-pulse">{theme.icon}</span>
             <div className="flex flex-col text-left">
               <span className={`text-[12px] font-black uppercase tracking-[0.4em] ${theme.accentColor} drop-shadow-md`}>Temporal Era</span>
               <span className="text-2xl font-black text-white/30 drop-shadow-md">PHASE {index}</span>
@@ -70,13 +78,13 @@ const Section: React.FC<SectionProps> = ({ theme, index, progress, onEnterRealm 
           </div>
           
           <h1 
-            className="text-6xl md:text-8xl font-black mb-6 text-white drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-none uppercase tracking-tighter"
+            className="text-6xl md:text-8xl font-black mb-6 text-white drop-shadow-[0_15px_35px_rgba(0,0,0,0.9)] leading-none uppercase tracking-tighter"
             style={{ fontFamily: theme.fontFamily }}
           >
             {theme.name}
           </h1>
           
-          <p className="text-xl md:text-2xl text-white/80 mb-10 max-w-xl italic font-light drop-shadow-xl">
+          <p className="text-xl md:text-2xl text-white/80 mb-10 max-w-xl italic font-light drop-shadow-xl leading-relaxed">
             "{theme.subtitle}"
           </p>
 
@@ -84,7 +92,7 @@ const Section: React.FC<SectionProps> = ({ theme, index, progress, onEnterRealm 
             <button 
               onClick={fetchWisdom}
               disabled={loading}
-              className="flex items-center gap-4 px-10 py-4 rounded-2xl bg-black/60 hover:bg-black/80 text-white border border-white/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 group backdrop-blur-2xl shadow-2xl"
+              className="flex items-center gap-4 px-10 py-4 rounded-2xl bg-black/60 hover:bg-white hover:text-black text-white border border-white/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 group backdrop-blur-2xl shadow-2xl"
             >
               <Sparkles size={20} className={`${theme.accentColor} group-hover:rotate-45 transition-transform duration-500`} />
               <span className="font-black tracking-[0.2em] text-[10px] uppercase">{loading ? 'SYNCING...' : 'CHANNEL WISDOM'}</span>
@@ -102,7 +110,7 @@ const Section: React.FC<SectionProps> = ({ theme, index, progress, onEnterRealm 
 
         {/* Center: Calendar */}
         <div className="flex-1 w-full max-w-sm">
-          <div className="shadow-[0_50px_100px_rgba(0,0,0,0.8)] rounded-[2.5rem]">
+          <div className="shadow-[0_60px_120px_rgba(0,0,0,0.9)] rounded-[2.5rem] transform hover:rotate-1 transition-transform duration-700">
             <Calendar theme={theme} />
           </div>
         </div>
@@ -111,19 +119,21 @@ const Section: React.FC<SectionProps> = ({ theme, index, progress, onEnterRealm 
         <div className="flex-[0.4] flex items-center justify-center">
           <button 
             onClick={() => onEnterRealm(theme)}
-            className="group relative flex flex-col items-center gap-4 p-8 rounded-[3rem] bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-3xl transition-all duration-500 hover:scale-110 shadow-2xl active:scale-95"
+            className="group relative flex flex-col items-center gap-6 p-10 rounded-[4rem] bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-3xl transition-all duration-700 hover:scale-110 shadow-2xl active:scale-95"
           >
             <div className={`absolute inset-0 ${theme.accentColor.replace('text-', 'bg-')} opacity-0 group-hover:opacity-10 blur-3xl transition-opacity rounded-full`} />
-            <div className={`w-20 h-20 rounded-full bg-black/40 flex items-center justify-center border border-white/10 ${theme.accentColor} shadow-[0_0_40px_rgba(0,0,0,0.5)] group-hover:shadow-[0_0_50px_currentColor] transition-all`}>
-              <Gamepad2 size={40} className="group-hover:rotate-12 transition-transform duration-500" />
+            <div className={`w-24 h-24 rounded-full bg-black/50 flex items-center justify-center border border-white/20 ${theme.accentColor} shadow-[0_0_40px_rgba(0,0,0,0.6)] group-hover:shadow-[0_0_60px_currentColor] transition-all duration-500`}>
+              <Gamepad2 size={48} className="group-hover:rotate-[20deg] group-hover:scale-110 transition-transform duration-500" />
             </div>
             <div className="text-center">
-              <p className="text-[10px] font-black tracking-[0.4em] opacity-40 uppercase mb-1">Related</p>
+              <p className="text-[10px] font-black tracking-[0.6em] opacity-30 uppercase mb-2">The Related</p>
               <p className={`text-sm font-black uppercase tracking-widest ${theme.accentColor}`} style={{ fontFamily: theme.fontFamily }}>
                 Enter Realm
               </p>
             </div>
-            <ArrowRight className="opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-500" />
+            <div className="flex gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
+               <ArrowRight size={18} className={theme.accentColor} />
+            </div>
           </button>
         </div>
       </div>
@@ -143,9 +153,11 @@ const Section: React.FC<SectionProps> = ({ theme, index, progress, onEnterRealm 
 
 function getAnimation(type: string): string {
     switch(type) {
-        case 'snow': return 'snow-fall linear infinite';
+        case 'snow': return 'snow-blow linear infinite';
         case 'bubbles': return 'bubble-rise ease-in infinite';
         case 'stars': return 'mana-spark ease-in-out infinite';
+        case 'leaves': return 'leaf-drift ease-in-out infinite';
+        case 'rain': return 'rain-fall linear infinite';
         default: return 'none';
     }
 }

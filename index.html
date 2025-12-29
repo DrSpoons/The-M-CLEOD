@@ -27,7 +27,7 @@
         }
         /* Layering Logic */
         .layer-wrapper {
-            height: 100vh; /* Exactly 100vh to keep scrolling snappy */
+            height: 100vh;
             position: relative;
             width: 100%;
         }
@@ -37,7 +37,7 @@
             height: 100vh;
             width: 100%;
             overflow: hidden;
-            box-shadow: 0 -20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 -20px 80px rgba(0,0,0,0.8);
         }
 
         /* Custom Scrollbar */
@@ -46,23 +46,31 @@
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         
         /* Thematic Animations */
-        @keyframes drift {
-            from { transform: translateX(-10%) translateY(-10%) rotate(0deg); }
-            to { transform: translateX(10%) translateY(10%) rotate(5deg); }
-        }
-        @keyframes snow-fall {
-            0% { transform: translateY(-10vh) translateX(0); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(110vh) translateX(20px); opacity: 0; }
+        @keyframes snow-blow {
+            0% { transform: translateY(-10vh) translateX(-20vw) rotate(0deg); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(110vh) translateX(40vw) rotate(360deg); opacity: 0; }
         }
         @keyframes bubble-rise {
-            0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
-            50% { opacity: 0.6; }
-            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+            0% { transform: translateY(110vh) translateX(0) scale(0.5); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) translateX(20px) scale(1.2); opacity: 0; }
         }
         @keyframes mana-spark {
-            0%, 100% { opacity: 0; transform: scale(0); }
-            50% { opacity: 1; transform: scale(1); }
+            0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.5) rotate(180deg); }
+        }
+        @keyframes leaf-drift {
+            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translateY(110vh) translateX(100px) rotate(720deg); opacity: 0; }
+        }
+        @keyframes rain-fall {
+            0% { transform: translateY(-20vh) skewX(-20deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(120vh) skewX(-20deg); opacity: 0; }
         }
     </style>
 <script type="importmap">
@@ -79,5 +87,7 @@
 </head>
 <body>
     <div id="root"></div>
+    <!-- Entry point script -->
+    <script type="module" src="index.tsx"></script>
 </body>
 </html>
