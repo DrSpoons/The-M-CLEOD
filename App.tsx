@@ -1,25 +1,40 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { THEMES } from './constants';
-import Section from './components/Section';
-import { ThemeConfig } from './types';
+import { THEMES } from './constants.ts';           // Added .ts
+import Section from './components/Section.tsx';    // Added .tsx
+import { ThemeConfig } from './types.ts';           // Added .ts
 import { Menu, X, ChevronDown, Gamepad2, ArrowLeft } from 'lucide-react';
 
 const App: React.FC = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
   const [activeRealm, setActiveRealm] = useState<ThemeConfig | null>(null);
-  const [scrollRatios, setScrollRatios] = useState<number[]>(new Array(THEMES.length).fill(0));
+  
+  // Initialize first section as fully visible (progress = 1)
+  const [scrollRatios, setScrollRatios] = useState<number[]>(() => {
+    const initial = new Array(THEMES.length).fill(0);
+    initial[0] = 1;
+    return initial;
+  });
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!scrollRef.current || activeRealm) return;
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const calculateRatios = () => {
+      if (!container || activeRealm) return;
       
-      const containerHeight = scrollRef.current.clientHeight;
-      const scrollTop = scrollRef.current.scrollTop;
+      const containerHeight = container.clientHeight;
+      const scrollTop = container.scrollTop;
       
+      if (containerHeight === 0) return;
+
       const newRatios = THEMES.map((_, i) => {
+        // distance: how far into the viewport this section has scrolled
+        // For section i, it starts entering when scrollTop reaches (i-1)*H
+        // and is fully centered when scrollTop reaches i*H
         const distance = scrollTop - (i - 1) * containerHeight;
         const ratio = Math.max(0, Math.min(1, distance / containerHeight));
         return ratio;
@@ -31,12 +46,21 @@ const App: React.FC = () => {
       setActiveSection(Math.max(0, Math.min(index, THEMES.length - 1)));
     };
 
-    const container = scrollRef.current;
-    if (container) {
-      container.addEventListener('scroll', handleScroll, { passive: true });
-      handleScroll(); 
-    }
-    return () => container?.removeEventListener('scroll', handleScroll);
+    // Use ResizeObserver to catch the initial layout paint
+    const resizeObserver = new ResizeObserver(() => {
+      calculateRatios();
+    });
+    resizeObserver.observe(container);
+
+    container.addEventListener('scroll', calculateRatios, { passive: true });
+    
+    // Immediate calculation for safety
+    calculateRatios();
+
+    return () => {
+      container.removeEventListener('scroll', calculateRatios);
+      resizeObserver.disconnect();
+    };
   }, [activeRealm]);
 
   const scrollToSection = (index: number) => {
@@ -56,12 +80,10 @@ const App: React.FC = () => {
     setActiveRealm(null);
   };
 
-  // The Game/Related Page Component
   const RealmView = ({ theme }: { theme: ThemeConfig }) => (
     <div className={`fixed inset-0 z-[300] bg-gradient-to-b ${theme.bgGradient} flex flex-col p-8 sm:p-16 animate-in fade-in zoom-in-95 duration-500`}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-[100px] pointer-events-none" />
       
-      {/* Header */}
       <div className="relative z-10 flex justify-between items-center mb-16">
         <button 
           onClick={handleExitRealm}
@@ -78,7 +100,6 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* Game Content Placeholder */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center">
         <div className={`w-32 h-32 rounded-full bg-black/40 flex items-center justify-center border border-white/10 ${theme.accentColor} mb-8 shadow-2xl`}>
           <Gamepad2 size={64} className="animate-pulse" />
@@ -103,10 +124,8 @@ const App: React.FC = () => {
 
   return (
     <div className="relative h-screen w-screen bg-black font-sans text-white overflow-hidden">
-      {/* Realm View Overlay */}
       {activeRealm && <RealmView theme={activeRealm} />}
 
-      {/* Layered Scroll Container */}
       <div 
         ref={scrollRef}
         className={`scroll-container h-full transition-all duration-700 ${activeRealm ? 'scale-110 blur-3xl opacity-0 pointer-events-none' : 'scale-100 opacity-100'}`}
@@ -121,7 +140,7 @@ const App: React.FC = () => {
               <Section 
                 theme={theme} 
                 index={index} 
-                progress={scrollRatios[index]} 
+                progress={scrollRatios[index] || 0} 
                 onEnterRealm={handleEnterRealm}
               />
             </div>
@@ -129,7 +148,6 @@ const App: React.FC = () => {
         ))}
       </div>
 
-      {/* Navigation and HUD (only visible in chronicle) */}
       {!activeRealm && (
         <>
           <nav className="fixed top-0 left-0 right-0 z-[100] p-6 flex justify-between items-center pointer-events-none">
@@ -169,7 +187,6 @@ const App: React.FC = () => {
         </>
       )}
 
-      {/* Nav Menu */}
       {isNavOpen && !activeRealm && (
         <div className="fixed inset-0 z-[200] bg-black/98 backdrop-blur-[50px] flex flex-col p-8 sm:p-16 animate-in fade-in duration-500">
           <div className="flex justify-between items-center mb-16">
