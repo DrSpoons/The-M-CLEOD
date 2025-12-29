@@ -1,5 +1,5 @@
 
-import { ThemeConfig } from './types';
+import { ThemeConfig } from './types.ts';
 
 export const THEMES: ThemeConfig[] = [
   {

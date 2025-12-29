@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { THEMES } from './constants.ts';           // Added .ts
+import { THEMES } from './constants.tsx';           // Added .ts
 import Section from './components/Section.tsx';    // Added .tsx
 import { ThemeConfig } from './types.ts';           // Added .ts
 import { Menu, X, ChevronDown, Gamepad2, ArrowLeft } from 'lucide-react';
