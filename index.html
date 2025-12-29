@@ -76,7 +76,12 @@
 </head>
 <body>
     <div id="root"></div>
-    <!-- Use type="text/babel" to ensure Babel transpiles it for GitHub Pages -->
-    <script type="text/babel" data-type="module" src="index.tsx"></script>
+    <!-- 
+      IMPORTANT: 
+      1. type="text/babel" tells Babel to transpile this.
+      2. data-presets="react,typescript" tells Babel which languages to support.
+      3. data-type="module" allows the use of 'import' statements inside the transpiled code.
+    -->
+    <script type="text/babel" data-presets="react,typescript" data-type="module" src="index.tsx"></script>
 </body>
 </html>

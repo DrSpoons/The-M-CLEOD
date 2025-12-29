@@ -7,25 +7,8 @@ import {
   Sparkles, BookOpen, ArrowRight 
 } from 'lucide-react';
 
-// --- TYPES ---
-interface ThemeConfig {
-  id: string;
-  name: string;
-  subtitle: string;
-  monthName: string;
-  monthIndex: number; 
-  bgGradient: string;
-  accentColor: string;
-  fontFamily: string;
-  icon: string;
-  description: string;
-  particleType: 'stars' | 'bubbles' | 'leaves' | 'rain' | 'snow' | 'none';
-  geminiPrompt: string;
-  gameTitle: string;
-}
-
-// --- CONSTANTS ---
-const THEMES: ThemeConfig[] = [
+// --- THEMES CONFIGURATION ---
+const THEMES = [
   {
     id: 'home',
     name: 'M-CLEOD CORE',
@@ -226,7 +209,7 @@ const THEMES: ThemeConfig[] = [
 // --- AI SERVICE ---
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
-async function getThematicWisdom(prompt: string): Promise<string> {
+async function getThematicWisdom(prompt) {
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -240,7 +223,7 @@ async function getThematicWisdom(prompt: string): Promise<string> {
 }
 
 // --- COMPONENTS ---
-const CalendarComp: React.FC<{ theme: ThemeConfig }> = ({ theme }) => {
+const CalendarComp = ({ theme }) => {
   const now = new Date();
   const year = now.getFullYear();
   const month = theme.monthIndex;
@@ -274,11 +257,10 @@ const CalendarComp: React.FC<{ theme: ThemeConfig }> = ({ theme }) => {
   );
 };
 
-const SectionComp: React.FC<{ theme: ThemeConfig; index: number; progress: number; onEnter: (t: ThemeConfig) => void }> = ({ theme, index, progress, onEnter }) => {
-  const [wisdom, setWisdom] = useState<string | null>(null);
+const SectionComp = ({ theme, index, progress, onEnter }) => {
+  const [wisdom, setWisdom] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Parallax Logic
   const bgShift = (1 - progress) * 150;
   const contentShift = (1 - progress) * 60;
   const scale = 0.9 + (progress * 0.1);
@@ -298,7 +280,7 @@ const SectionComp: React.FC<{ theme: ThemeConfig; index: number; progress: numbe
     setLoading(false);
   };
 
-  const anim = (t: string) => {
+  const anim = (t) => {
     switch(t) {
       case 'snow': return 'snow-blow linear infinite';
       case 'bubbles': return 'bubble-rise ease-in infinite';
@@ -311,7 +293,6 @@ const SectionComp: React.FC<{ theme: ThemeConfig; index: number; progress: numbe
 
   return (
     <section className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
-      {/* Background Parallax */}
       <div className={`absolute inset-0 bg-gradient-to-b ${theme.bgGradient} transition-transform duration-100 ease-out`}
            style={{ transform: `translateY(${bgShift * 0.2}px) scale(1.1)` }} />
       
@@ -320,7 +301,6 @@ const SectionComp: React.FC<{ theme: ThemeConfig; index: number; progress: numbe
         <span className="text-[70vw]">{theme.icon}</span>
       </div>
 
-      {/* Atmospheric Particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {particles.map((p, i) => (
           <div key={i} className="absolute rounded-full"
@@ -337,7 +317,6 @@ const SectionComp: React.FC<{ theme: ThemeConfig; index: number; progress: numbe
         ))}
       </div>
 
-      {/* Interactive Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-8 flex flex-col md:flex-row items-center justify-center gap-16 transition-all duration-700"
            style={{ transform: `translateY(${contentShift}px) scale(${scale})`, opacity: Math.max(0, (progress - 0.2) / 0.8) }}>
         
@@ -386,12 +365,11 @@ const SectionComp: React.FC<{ theme: ThemeConfig; index: number; progress: numbe
   );
 };
 
-// --- APP ---
-const App: React.FC = () => {
+const App = () => {
   const [activeSection, setActiveSection] = useState(0);
-  const [activeRealm, setActiveRealm] = useState<ThemeConfig | null>(null);
-  const [scrollRatios, setScrollRatios] = useState<number[]>(new Array(THEMES.length).fill(0));
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeRealm, setActiveRealm] = useState(null);
+  const [scrollRatios, setScrollRatios] = useState(new Array(THEMES.length).fill(0));
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -410,7 +388,7 @@ const App: React.FC = () => {
     return () => { el.removeEventListener('scroll', update); ro.disconnect(); };
   }, [activeRealm]);
 
-  const scrollTo = (i: number) => {
+  const scrollTo = (i) => {
     scrollRef.current?.scrollTo({ top: i * scrollRef.current.clientHeight, behavior: 'smooth' });
   };
 
@@ -466,5 +444,5 @@ const App: React.FC = () => {
 };
 
 // --- RENDER ---
-const root = ReactDOM.createRoot(document.getElementById('root')!);
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
