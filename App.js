@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { THEMES } from './constants.tsx';           // Added .ts
-import Section from './components/Section.tsx';    // Added .tsx
-import { ThemeConfig } from './types.ts';           // Added .ts
+import { THEMES } from './constants.js';           // Added .ts
+import Section from './components/Section.js';    // Added .tsx
+import { ThemeConfig } from './types.js';           // Added .ts
 import { Menu, X, ChevronDown, Gamepad2, ArrowLeft } from 'lucide-react';
 
 const App: React.FC = () => {
