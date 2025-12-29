@@ -59,6 +59,14 @@
             100% { transform: translateY(120vh); opacity: 0; }
         }
     </style>
+    <!-- Define process shim before anything else loads -->
+    <script>
+        window.process = {
+            env: {
+                API_KEY: "" // Will be injected or handled by the host environment
+            }
+        };
+    </script>
     <!-- Babel standalone for browser-side TSX transpilation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script type="importmap">
@@ -77,10 +85,8 @@
 <body>
     <div id="root"></div>
     <!-- 
-      IMPORTANT: 
-      1. type="text/babel" tells Babel to transpile this.
-      2. data-presets="react,typescript" tells Babel which languages to support.
-      3. data-type="module" allows the use of 'import' statements inside the transpiled code.
+      Using type="text/babel" and providing typescript preset 
+      to ensure Babel processes the .tsx file correctly in-browser.
     -->
     <script type="text/babel" data-presets="react,typescript" data-type="module" src="index.tsx"></script>
 </body>

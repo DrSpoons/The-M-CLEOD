@@ -207,10 +207,9 @@ const THEMES = [
 ];
 
 // --- AI SERVICE ---
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-
 async function getThematicWisdom(prompt) {
   try {
+    const ai = new GoogleGenAI({ apiKey: window.process.env.API_KEY || '' });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
@@ -218,7 +217,8 @@ async function getThematicWisdom(prompt) {
     });
     return response.text || "...";
   } catch (e) {
-    return "The temporal link is unstable.";
+    console.error("AI Error:", e);
+    return "The temporal link is unstable. (API Key Required)";
   }
 }
 
@@ -276,7 +276,8 @@ const SectionComp = ({ theme, index, progress, onEnter }) => {
 
   const handleWisdom = async () => {
     setLoading(true);
-    setWisdom(await getThematicWisdom(theme.geminiPrompt));
+    const result = await getThematicWisdom(theme.geminiPrompt);
+    setWisdom(result);
     setLoading(false);
   };
 
@@ -378,8 +379,10 @@ const App = () => {
       const h = el.clientHeight;
       const top = el.scrollTop;
       if (h === 0) return;
-      setScrollRatios(THEMES.map((_, i) => Math.max(0, Math.min(1, (top - (i - 1) * h) / h))));
-      setActiveSection(Math.min(Math.round(top / h), THEMES.length - 1));
+      const newRatios = THEMES.map((_, i) => Math.max(0, Math.min(1, (top - (i - 1) * h) / h)));
+      setScrollRatios(newRatios);
+      const idx = Math.min(Math.round(top / h), THEMES.length - 1);
+      setActiveSection(idx);
     };
     const ro = new ResizeObserver(update);
     ro.observe(el);
