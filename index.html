@@ -7,6 +7,7 @@
     
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
+    <script type="text/babel" data-type="module" src="index.js">
     import React, { useState, useEffect, useRef, useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
 import { GoogleGenAI } from "@google/genai";
@@ -534,6 +535,6 @@ const rootElement = document.getElementById('root');
 const root = ReactDOM.createRoot(rootElement);
 root.render(<App />);
     
-    <script type="text/babel" data-type="module" src="index.js"></script>
+    </script>
 </body>
 </html>
