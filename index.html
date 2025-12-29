@@ -1,58 +1,77 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The M-CLEOD</title>
-    
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>The M-CLEOD | Temporal Chronicle</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script type="importmap">
-    {
-      "imports": {
-        "react": "https://esm.sh/react@18.2.0",
-        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-        "lucide-react": "https://esm.sh/lucide-react@0.263.1",
-        "@google/genai": "https://esm.sh/@google/genai"
-      }
-    }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Cinzel+Decorative:wght@400;700;900&family=Pirata+One&family=Orbitron:wght@400;700;900&family=MedievalSharp&family=Special+Elite&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; background: black; color: white; font-family: sans-serif; }
-        .scroll-container { height: 100vh; overflow-y: auto; scroll-snap-type: y mandatory; }
-        .section { height: 100vh; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        html, body { margin: 0; padding: 0; background: #000; overflow: hidden; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+        #root { height: 100vh; }
+        .scroll-container { 
+            height: 100vh; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            background: #000; 
+            scroll-snap-type: y mandatory; 
+        }
+        .layer-wrapper { 
+            height: 100vh; 
+            position: relative; 
+            width: 100%; 
+            scroll-snap-align: start; 
+        }
+        .sticky-layer { 
+            position: sticky; 
+            top: 0; 
+            height: 100vh; 
+            width: 100%; 
+            overflow: hidden; 
+        }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        
+        @keyframes snow-blow {
+            0% { transform: translateY(-10vh) translateX(-20vw) rotate(0deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(110vh) translateX(40vw) rotate(360deg); opacity: 0; }
+        }
+        @keyframes bubble-rise {
+            0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+        @keyframes mana-spark {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+        @keyframes leaf-drift {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+        @keyframes rain-fall {
+            0% { transform: translateY(-20vh); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(120vh); opacity: 0; }
+        }
     </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
+  }
+}
+</script>
 </head>
 <body>
     <div id="root"></div>
-
-    <script type="text/babel" data-type="module">
-        import React, { useState, useEffect, useRef } from 'react';
-        import ReactDOM from 'react-dom/client';
-        import { Sparkles, Gamepad2 } from 'lucide-react';
-
-        const THEMES = [
-            { id: 'home', name: 'WELCOME TO M-CLEOD', icon: '✨', bg: 'bg-slate-900' },
-            { id: 'jan', name: 'FROST KINGDOM', icon: '❄️', bg: 'bg-blue-900' }
-        ];
-
-        const App = () => {
-            return (
-                <div className="scroll-container">
-                    {THEMES.map(t => (
-                        <div key={t.id} className={`section ${t.bg}`}>
-                            <span className="text-8xl mb-4">{t.icon}</span>
-                            <h1 className="text-4xl font-black">{t.name}</h1>
-                            <p className="mt-4 opacity-50">Scroll down to explore</p>
-                        </div>
-                    ))}
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+    <script type="module" src="index.tsx"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Calendar from './Calendar';
-import { ThemeConfig } from '../types.js';
+import { ThemeConfig } from '../types';
 import { getThematicWisdom } from '../services/geminiService';
 import { Sparkles, BookOpen, Gamepad2, ArrowRight } from 'lucide-react';
 
